@@ -3,6 +3,7 @@ package principal;
 import interfaz.Consola;
 import persistencia.*;
 import datos.*;
+import java.io.File;
 import java.util.Scanner;
 
 public class Principal {
@@ -10,7 +11,6 @@ public class Principal {
     private static Archivo m2;
     private static Register reg;
     private static Articulo art;
-
     /**
      * Muestra el contenido de un archivo (incluidos los registros marcados como
      * borrados) es de utilidad para verificar el contenido del archivo a medida
@@ -39,10 +39,14 @@ public class Principal {
         while (!m2.eof()) {
             reg = m2.leerRegistro();
             if (reg.getActivo()) {
-                reg.mostrarRegistro(); /* En el caso de requerirse un modo determinado de impresión
-            * por ejemplo en columnas, este método deberá organizar el titulo y encabezado del
-            * listado y convocar a leerRegistro para luego mostrarlo de acuerdo a la solicitud
-            * sin convocar al metodo mostrarRegistro */
+                reg.mostrarRegistro(); /*
+                                        * En el caso de requerirse un modo determinado de impresión
+                                        * por ejemplo en columnas, este método deberá organizar el titulo y encabezado
+                                        * del
+                                        * listado y convocar a leerRegistro para luego mostrarlo de acuerdo a la
+                                        * solicitud
+                                        * sin convocar al metodo mostrarRegistro
+                                        */
             }
         }
         m2.cerrarArchivo();
@@ -58,7 +62,8 @@ public class Principal {
         aux.setDatos(art);
         aux.setActivo(true);
         return aux;
-        /* Si utilizaramos la instancia reg, nos encontrariamos modificando
+        /*
+         * Si utilizaramos la instancia reg, nos encontrariamos modificando
          * el espacio de memoria relacionado con la lectura del archivo y por lo tanto
          * cambiaria a medida que avanzaramos sobre el archivo. OJO CON ESTO
          */
@@ -87,11 +92,28 @@ public class Principal {
         m2.cerrarArchivo();
     }
 
+    /**
+     * 
+     * @param args
+     */
     public static void main(String[] args) {
+
         int op;
+        File folderManager = new File("C:/Archivos");  
 
         try {
-            m2 = new Archivo("c:/Archivos/Articulos.dat", new Articulo()); // colocar el camino correcto del archivo que usemos
+            if (!folderManager.exists()) {
+                if (folderManager.mkdir()) {
+                    System.out.println("Directorio Creado");
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error:" + e.getMessage());
+        }
+
+        try {
+            m2 = new Archivo("c:/Archivos/Articulos.dat", new Articulo()); // colocar el camino correcto del archivo que
+                                                                                  // usemos
         } catch (ClassNotFoundException e) {
             System.out.println("Error al crear los descriptores de archivos: " + e.getMessage());
             System.exit(1);
@@ -128,48 +150,41 @@ public class Principal {
                     reg = leerArticulo();
                     m2.cargarUnRegistro(reg);
                     break;
-
                 case 2:
                     System.out.println("Carga de registros de Artículos: ");
                     cargarArticulos();
                     break;
-
                 case 3:
                     System.out.println("Ingrese el artículo a borrar: ");
                     reg.cargarNroOrden();
                     m2.bajaRegistro(reg);
                     break;
-
                 case 4:
                     System.out.println("Ingrese el artículo a modificar: ");
                     reg.cargarNroOrden();
                     m2.modificarRegistro(reg); // Evitamos usar reg que ya está vinculado al archivo
                     break;
-
                 case 5:
                     System.out.println("Se muestra el archivo de Articulos (sin incluir 'borrados')...");
                     mostrarActivos();
                     break;
-
                 case 6:
                     System.out.println("Se muestra el archivo de Articulos (incluyendo 'borrados')...");
                     mostrarTodo();
                     break;
-
                 case 7:
                     System.out.println("Se eliminan registros de Articulos marcados...");
                     m2.depurar();
                     System.out.println("\nOperacion terminada...");
                     break;
-
                 case 8:
                     System.out.println("Borrar el contenido del Archivo de Articulos...");
                     m2.crearArchivoVacio(new Register(art, 0));
                     System.out.println("\nOperacion terminada...");
                     break;
-
                 case 9:
-                    ;
+                    System.out.println("Cerrado");
+                    break;
             }
         } while (op != 9);
     }
